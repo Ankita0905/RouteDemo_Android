@@ -1,10 +1,15 @@
 package com.example.routedemo_android;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -23,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     GoogleMap mMap;
+    private final int Request_code = 1;
 
     // variables to get the user location
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -34,6 +40,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initMap();
+        getUserLocation();
+        if(!checkPermission())
+            requestPermission();
+        else
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.myLooper());
     }
     private void initMap()
     {
@@ -74,6 +85,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         };
+    }
+
+    private boolean checkPermission()
+    {
+        int permissionState = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        return permissionState == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermission()
+    {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Request_code);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == Request_code)
+        {
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+               setHomeMarker();
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+            }
+        }
     }
 
     @Override
