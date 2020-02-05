@@ -17,6 +17,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
+import android.widget.Switch;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -33,6 +34,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     GoogleMap mMap;
@@ -42,6 +45,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient fusedLocationProviderClient;
     LocationCallback locationCallback;
     LocationRequest locationRequest;
+
+
+    // latitude, longitude
+    double latitude, longitude;
+    final int radius = 1500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +87,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (Location location : locationResult.getLocations())
                 {
                     LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+
+                    latitude = userLocation.latitude;
+                    longitude = userLocation.longitude;
 
                     CameraPosition cameraPosition = CameraPosition.builder()
                             .target(userLocation)
@@ -138,7 +149,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void btnClick(View view)
     {
-        
+        switch(view.getId())
+        {
+            case R.id.btn_restaurant:
+                //get the url from places api
+                String url = getUrl(latitude, longitude, "restaurant");
+                Objects[] dataTransfer = new Objects[2];
+                dataTransfer[0] = mMap;
+                
+        }
+    }
+
+    private String getUrl(double latitude, double longitude, String nearByPalce)
+    {
+        StringBuilder placeUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        placeUrl.append("location="+latitude+","+longitude);
+        placeUrl.append("&radius"+radius);
+        placeUrl.append("&type"+"restaurant");
+        placeUrl.append("&key"+getString(R.string.api_key));
+        return  placeUrl.toString();
     }
 }
 
