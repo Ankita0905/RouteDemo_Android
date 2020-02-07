@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -154,9 +155,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.btn_restaurant:
                 //get the url from places api
                 String url = getUrl(latitude, longitude, "restaurant");
-                Objects[] dataTransfer = new Objects[2];
+                Object[] dataTransfer = new Object[2];
                 dataTransfer[0] = mMap;
-                
+                dataTransfer[1] = url;
+                GetNearByPlaceData getNearByPlaceData = new GetNearByPlaceData();
+                getNearByPlaceData.execute(dataTransfer);
+                Toast.makeText(this, "Restaurants", Toast.LENGTH_SHORT).show();
+                break;
+
         }
     }
 
@@ -164,9 +170,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     {
         StringBuilder placeUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         placeUrl.append("location="+latitude+","+longitude);
-        placeUrl.append("&radius"+radius);
-        placeUrl.append("&type"+"restaurant");
-        placeUrl.append("&key"+getString(R.string.api_key));
+        placeUrl.append("&radius="+radius);
+        placeUrl.append("&type="+ nearByPalce);
+        placeUrl.append("&key="+getString(R.string.api_key));
         return  placeUrl.toString();
     }
 }

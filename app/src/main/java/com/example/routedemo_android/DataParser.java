@@ -36,7 +36,6 @@ public class DataParser {
             place.put("longitude", longitude);
             place.put("reference", reference);
 
-
         }
         catch (JSONException e)
         {
